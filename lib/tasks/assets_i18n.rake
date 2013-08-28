@@ -27,6 +27,10 @@ namespace :i18n do
       end
     end
 
+    def locale_name(filename)
+      filename.match(/.*-([^\.]+)\..*/)[1]
+    end
+
     desc "Compile all the localized assets named in config.assets.localized_precompile"
     task :precompile do
       invoke_or_reboot_rake_task "i18n:assets:precompile:all"
@@ -55,8 +59,8 @@ namespace :i18n do
         
         asset = ENV['LOCALIZED_ASSET']
         # extract locale
-        locale = asset.match(/.*-([[:alpha:]][[:alpha:]])\..*/)[1]
-            
+        locale = locale_name(asset)
+
         I18n.locale = locale
 
         manifest_path =  config.assets.manifest ? "#{config.assets.manifest}.#{locale}" : "#{target}/i18n_manifest.#{locale}"
@@ -91,7 +95,7 @@ namespace :i18n do
         
         if config.assets.localized_precompile
           config.assets.localized_precompile.each do |asset|
-            locale = asset.match(/.*-([[:alpha:]][[:alpha:]])\..*/)[1]
+            locale = locale_name(asset)
 
             localized_manifest_file = config.assets.manifest ? "#{config.assets.manifest}/i18n_manifest.#{locale}/manifest.yml" : "#{target}/i18n_manifest.#{locale}/manifest.yml"
             File.open(localized_manifest_file) do |f|
